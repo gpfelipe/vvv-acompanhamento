@@ -107,6 +107,14 @@ def main():
             b.text for b in resposta.content if b.type == "text"
         ).strip()
 
+    # Começa o relatório no título (primeira linha que começa com "# "),
+    # descartando qualquer recado ou preâmbulo antes dele.
+    linhas = texto_final.splitlines()
+    for i, linha in enumerate(linhas):
+        if linha.lstrip().startswith("# "):
+            texto_final = "\n".join(linhas[i:])
+            break
+
     nome_saida = f"{prefixo}-{hoje}.md"
     with open(nome_saida, "w", encoding="utf-8") as f:
         f.write(texto_final)
