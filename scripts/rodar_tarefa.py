@@ -91,7 +91,21 @@ def main():
             continue
         break
 
-    texto_final = "".join(b.text for b in resposta.content if b.type == "text")
+    # Pega só o relatório final: o texto que vem DEPOIS da última busca na web.
+    # Assim descartamos a narração de bastidores que fica entre as buscas.
+    indice_ultima_ferramenta = -1
+    for i, bloco in enumerate(resposta.content):
+        if bloco.type != "text":
+            indice_ultima_ferramenta = i
+
+    blocos_finais = resposta.content[indice_ultima_ferramenta + 1:]
+    texto_final = "".join(b.text for b in blocos_finais if b.type == "text").strip()
+
+    # Segurança: se não sobrou nada, cai de volta para todo o texto.
+    if not texto_final:
+        texto_final = "".join(
+            b.text for b in resposta.content if b.type == "text"
+        ).strip()
 
     nome_saida = f"{prefixo}-{hoje}.md"
     with open(nome_saida, "w", encoding="utf-8") as f:
