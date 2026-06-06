@@ -1,7 +1,27 @@
 # Documentação do Projeto — Acompanhamento VVV (Venice Token)
 
 > Documento de referência. Última atualização: 06/06/2026.
-> Projeto **pausado** no Claude Code — Felipe vai continuar rodando no Cowork.
+
+## ⏸️ PROJETO PAUSADO
+
+A automação por GitHub Actions está **pausada** (decisão de Felipe — custo da API).
+O projeto voltou a rodar de graça no **Cowork** (setup original, pasta local).
+Esta versão no GitHub fica **guardada/congelada** como arquivo, para retomar no futuro se quiser.
+
+- Os **3 agendamentos estão DESLIGADOS** (`disabled_manually`) — nada roda nem gasta crédito.
+
+### Como RELIGAR no futuro (quando quiser retomar)
+1. Recarregar créditos da API: [console.anthropic.com](https://console.anthropic.com) → Plans & Billing → Add credits (e, opcional, ligar Auto-reload).
+2. (Opcional, recomendado) Trocar o modelo para economizar: em `scripts/rodar_tarefa.py`, mudar a linha `MODELO = "claude-opus-4-8"` para `MODELO = "claude-sonnet-4-6"`.
+3. Religar os agendamentos. Pelo site: aba **Actions** → escolher cada workflow → botão **"..."/Enable workflow**. Ou pelo terminal com o GitHub CLI:
+   ```
+   gh workflow enable diaria.yml
+   gh workflow enable semanal-onchain.yml
+   gh workflow enable semanal-terceiros.yml
+   ```
+4. Testar rodando uma tarefa manualmente (ver seção 7).
+
+---
 
 ---
 
