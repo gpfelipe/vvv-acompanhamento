@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acompanhamento VVV — Venice Token</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #181b22;
+    --card2: #1f232c;
+    --txt: #e8eaed;
+    --muted: #9aa0aa;
+    --linha: #2a2f3a;
+    --verde: #2ecc71;
+    --vermelho: #e74c3c;
+    --amarelo: #f1c40f;
+    --azul: #4aa3ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  header p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--linha);
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 18px;
+  }
+  .card h2 { margin: 0 0 14px; font-size: 1rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+
+  /* Painel de status */
+  .status { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .bandeira {
+    width: 54px; height: 54px; border-radius: 50%;
+    flex-shrink: 0; box-shadow: 0 0 18px rgba(0,0,0,.4);
+  }
+  .bandeira.verde { background: var(--verde); }
+  .bandeira.amarelo { background: var(--amarelo); }
+  .bandeira.vermelho { background: var(--vermelho); }
+  .bandeira.cinza { background: #555; }
+  .status-txt { flex: 1; min-width: 240px; }
+  .status-txt .titulo { font-weight: 700; font-size: 1.05rem; }
+  .status-txt .resumo { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+  .status-itens { margin-top: 16px; display: grid; gap: 10px; }
+  .status-item { background: var(--card2); border-radius: 10px; padding: 10px 14px; border-left: 4px solid var(--linha); }
+  .status-item.f-verde { border-left-color: var(--verde); }
+  .status-item.f-amarelo { border-left-color: var(--amarelo); }
+  .status-item.f-vermelho { border-left-color: var(--vermelho); }
+  .si-titulo { font-weight: 600; font-size: .95rem; }
+  .si-detalhe { color: var(--muted); font-size: .88rem; margin-top: 4px; padding-left: 2px; }
+  .si-lista { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: .88rem; }
+  .si-lista li { margin: 4px 0; }
+  .si-lista strong { color: var(--txt); font-weight: 600; }
+
+  /* Setinhas de alta/baixa */
+  .seta { font-size: .8em; margin-right: 2px; }
+  /* Números alinhados (tabulados) */
+  .valor, table, .metrica .valor { font-variant-numeric: tabular-nums; }
+
+  /* Cabeçalho de métricas */
+  .metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .metrica { background: var(--card2); border-radius: 12px; padding: 14px; }
+  .metrica .rotulo { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; }
+  .metrica .valor { font-size: 1.35rem; font-weight: 700; margin-top: 4px; }
+  .sobe { color: var(--verde); }
+  .desce { color: var(--vermelho); }
+
+  /* Botões de período */
+  .periodos { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .periodos button {
+    background: var(--card2); color: var(--txt); border: 1px solid var(--linha);
+    border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: .9rem;
+  }
+  .periodos button.ativo { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+  /* Tabela */
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: right; padding: 9px 8px; border-bottom: 1px solid var(--linha); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+
+  /* Dados do protocolo */
+  .protocolo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .item { background: var(--card2); border-radius: 12px; padding: 14px; }
+  .item .rotulo { color: var(--muted); font-size: .8rem; }
+  .item .valor { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
+  .nd { color: var(--muted); font-weight: 400; font-size: .95rem; }
+
+  /* Abas */
+  .tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .tabs button { background: var(--card2); color: var(--txt); border: 1px solid var(--linha); border-radius: 10px; padding: 9px 16px; cursor: pointer; font-size: .92rem; font-weight: 600; }
+  .tabs button.ativo { background: var(--azul); border-color: var(--azul); color: #fff; }
+  .tab-conteudo[hidden] { display: none; }
+
+  /* Relatório renderizado (semanais) */
+  .relatorio { font-size: .92rem; line-height: 1.6; }
+  .relatorio h1 { font-size: 1.3rem; margin: .2em 0 .5em; }
+  .relatorio h2 { font-size: 1.1rem; color: var(--txt); text-transform: none; letter-spacing: 0; margin: 1.1em 0 .4em; border-bottom: 1px solid var(--linha); padding-bottom: 5px; }
+  .relatorio h3 { font-size: 1rem; margin: 1em 0 .3em; }
+  .relatorio table { width: 100%; border-collapse: collapse; margin: 12px 0; font-variant-numeric: tabular-nums; font-size: .88rem; }
+  .relatorio th, .relatorio td { border: 1px solid var(--linha); padding: 8px 10px; text-align: left; }
+  .relatorio th { background: var(--card2); color: var(--muted); }
+  .relatorio blockquote { margin: 10px 0; padding: 9px 13px; border-left: 4px solid var(--azul); background: var(--card2); border-radius: 0 8px 8px 0; color: var(--muted); }
+  .relatorio ul, .relatorio ol { padding-left: 20px; }
+  .relatorio li { margin: 5px 0; }
+  .relatorio strong { color: var(--txt); }
+  .relatorio a { color: var(--azul); word-break: break-word; }
+  .relatorio code { background: var(--card2); padding: 1px 5px; border-radius: 4px; }
+  .relatorio hr { border: 0; border-top: 1px solid var(--linha); margin: 16px 0; }
+
+  .rodape { color: var(--muted); font-size: .8rem; text-align: center; margin: 24px 0 8px; }
+  a { color: var(--azul); }
+
+  @media (max-width: 720px) {
+    .metricas { grid-template-columns: repeat(2, 1fr); }
+    .protocolo { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 460px) {
+    .protocolo { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>📊 Acompanhamento VVV — Venice Token</h1>
+    <p>Preço e dados do protocolo · valores em USD · <span id="atualizado">carregando…</span></p>
+  </header>
+
+  <!-- Abas -->
+  <div class="tabs">
+    <button data-alvo="tab-diario" class="ativo">Visão diária</button>
+    <button data-alvo="tab-onchain">On-chain, produto &amp; dev</button>
+    <button data-alvo="tab-terceiros">Terceiros (upstream)</button>
+  </div>
+
+  <section id="tab-diario" class="tab-conteudo">
+
+  <!-- Painel de status -->
+  <div class="card">
+    <h2>Status do dia</h2>
+    <div class="status">
+      <div id="bandeira" class="bandeira cinza"></div>
+      <div class="status-txt">
+        <div class="titulo" id="status-titulo">Carregando último relatório…</div>
+        <div class="resumo" id="status-resumo">—</div>
+      </div>
+    </div>
+    <div class="status-itens" id="status-itens"></div>
+  </div>
+
+  <!-- Métricas -->
+  <div class="card">
+    <h2>Mercado agora</h2>
+    <div class="metricas">
+      <div class="metrica"><div class="rotulo">Preço</div><div class="valor" id="m-preco">—</div></div>
+      <div class="metrica"><div class="rotulo">Variação 24h</div><div class="valor" id="m-var">—</div></div>
+      <div class="metrica"><div class="rotulo">Market cap</div><div class="valor" id="m-mcap">—</div></div>
+      <div class="metrica"><div class="rotulo">Volume 24h</div><div class="valor" id="m-vol">—</div></div>
+    </div>
+  </div>
+
+  <!-- Tabela 7 dias -->
+  <div class="card">
+    <h2>Histórico de 7 dias</h2>
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Fechamento</th><th>Variação do dia</th><th>Volume</th></tr>
+      </thead>
+      <tbody id="tabela-7d"><tr><td colspan="4">Carregando…</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Dados do protocolo -->
+  <div class="card">
+    <h2>Dados do protocolo</h2>
+    <div class="protocolo">
+      <div class="item"><div class="rotulo">Supply circulante</div><div class="valor" id="p-circ">—</div></div>
+      <div class="item"><div class="rotulo">Supply total</div><div class="valor" id="p-total">—</div></div>
+      <div class="item"><div class="rotulo">Supply máximo</div><div class="valor" id="p-max">—</div></div>
+      <div class="item"><div class="rotulo">Emissão programada</div><div class="valor">3M VVV/ano <span class="nd">(a partir de jul/2026)</span></div></div>
+      <div class="item"><div class="rotulo">% em staking</div><div class="valor nd">não divulgado</div></div>
+      <div class="item"><div class="rotulo">APR de staking</div><div class="valor nd">ver relatório</div></div>
+    </div>
+    <p class="nd" style="margin:14px 0 0">Dados detalhados (holders na Base, % queimado, ARR da Venice, buyback &amp; burn) ficam nos relatórios semanais on-chain.</p>
+  </div>
+
+  </section>
+
+  <section id="tab-onchain" class="tab-conteudo" hidden>
+    <div class="card">
+      <h2>On-chain, produto e desenvolvimento (semanal)</h2>
+      <div class="relatorio" id="rel-onchain">Carregando…</div>
+    </div>
+  </section>
+
+  <section id="tab-terceiros" class="tab-conteudo" hidden>
+    <div class="card">
+      <h2>Terceiros — fornecedores upstream (semanal)</h2>
+      <div class="relatorio" id="rel-terceiros">Carregando…</div>
+    </div>
+  </section>
+
+  <div class="rodape">
+    Fontes: <a href="https://www.coingecko.com/pt-br/moedas/venice-token" target="_blank">CoinGecko</a> (preço) ·
+    relatórios automáticos no GitHub. Esta página não é recomendação de investimento.
+  </div>
+
+</div>
+
+<script>
+// ===== Configurações =====
+const ID_MOEDA = "venice-token";
+const REPO = "gpfelipe/vvv-acompanhamento";
+const PREFIXO_DIARIA = "VVV-diaria-sentimento-risco-";
+const PREFIXO_ONCHAIN = "VVV-on-chain-produto-e-dev-";
+const PREFIXO_TERCEIROS = "VVV-terceiros-upstream-";
+
+// Lê a lista de arquivos do repositório uma única vez (evita estourar limite).
+let _listaRepo = null;
+async function listarRepo() {
+  if (!_listaRepo) {
+    _listaRepo = await (await fetch(`https://api.github.com/repos/${REPO}/contents/`)).json();
+  }
+  return _listaRepo;
+}
+
+// ===== Ajudas de formatação =====
+const fmtUSD = (v, casas = 2) =>
+  v == null ? "—" : v.toLocaleString("pt-BR", { style: "currency", currency: "USD", minimumFractionDigits: casas, maximumFractionDigits: casas });
+const fmtNum = (v) => v == null ? "—" : Math.round(v).toLocaleString("pt-BR");
+const fmtCompact = (v) =>
+  v == null ? "—" : "US$ " + v.toLocaleString("pt-BR", { notation: "compact", maximumFractionDigits: 1 });
+const fmtPct = (v) => (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+// Variação com setinha: ▲ verde para alta, ▼ vermelho para baixa
+const setaPct = (v) => {
+  const cls = v >= 0 ? "sobe" : "desce";
+  const seta = v >= 0 ? "▲" : "▼";
+  return `<span class="${cls}"><span class="seta">${seta}</span>${Math.abs(v).toFixed(2)}%</span>`;
+};
+
+// Deixa um trecho de texto do relatório mais visual: setinhas nos %, valores em
+// destaque, e bullish/bearish coloridos.
+function destacar(s) {
+  // Percentuais com sinal explícito (+10,10% / −10,50% / -3.77%)
+  s = s.replace(/([+\-−])\s?(\d+(?:[.,]\d+)?)\s?%/g, (m, sig, num) => {
+    const sobe = sig === "+";
+    return `<span class="${sobe ? "sobe" : "desce"}"><span class="seta">${sobe ? "▲" : "▼"}</span>${num}%</span>`;
+  });
+  // "alta de 1,40%" / "queda de 10,5%" (sem sinal)
+  s = s.replace(/\b(alta|subiu|valoriz\w*|ganho)\s+de\s+(\d+(?:[.,]\d+)?)\s?%/gi,
+    (m, w, n) => `${w} de <span class="sobe"><span class="seta">▲</span>${n}%</span>`);
+  s = s.replace(/\b(queda|caiu|recuo|perda|desvaloriz\w*)\s+de\s+(\d+(?:[.,]\d+)?)\s?%/gi,
+    (m, w, n) => `${w} de <span class="desce"><span class="seta">▼</span>${n}%</span>`);
+  // Valores em dólar em destaque
+  s = s.replace(/US\$\s?\d[\d.,]*\s?[MmBbKk]?/g, m => `<strong>${m}</strong>`);
+  // Tom de mercado
+  s = s.replace(/\bbullish\b/gi, '<span class="sobe">bullish</span>');
+  s = s.replace(/\bbearish\b/gi, '<span class="desce">bearish</span>');
+  return s;
+}
+
+// Quebra a explicação em tópicos (bullets) usando ";" como separador.
+function detalheEmTopicos(txt) {
+  const partes = txt.split(/;\s+/).map(p => p.trim()).filter(Boolean);
+  if (partes.length <= 1) {
+    return `<div class="si-detalhe">${destacar(txt)}</div>`;
+  }
+  return `<ul class="si-lista">${partes.map(p => `<li>${destacar(p)}</li>`).join("")}</ul>`;
+}
+
+// ===== 1) Métricas + supply (1 chamada) =====
+async function carregarMercado() {
+  const url = `https://api.coingecko.com/api/v3/coins/${ID_MOEDA}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false`;
+  const r = await fetch(url);
+  const d = await r.json();
+  const md = d.market_data;
+
+  document.getElementById("m-preco").textContent = fmtUSD(md.current_price.usd, md.current_price.usd < 10 ? 4 : 2);
+
+  const v24 = md.price_change_percentage_24h;
+  document.getElementById("m-var").innerHTML = setaPct(v24);
+
+  document.getElementById("m-mcap").textContent = fmtCompact(md.market_cap.usd);
+  document.getElementById("m-vol").textContent = fmtCompact(md.total_volume.usd);
+
+  document.getElementById("p-circ").textContent = fmtNum(md.circulating_supply) + " VVV";
+  document.getElementById("p-total").textContent = md.total_supply ? fmtNum(md.total_supply) + " VVV" : "—";
+  document.getElementById("p-max").innerHTML = md.max_supply ? fmtNum(md.max_supply) + " VVV" : '<span class="nd">sem teto fixo</span>';
+
+  document.getElementById("atualizado").textContent =
+    "atualizado em " + new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+}
+
+// ===== 2) Histórico (1 chamada de 1 ano, fatiado localmente) =====
+let historico = null; // [{t: Date, preco, volume}]
+
+async function carregarHistorico() {
+  const url = `https://api.coingecko.com/api/v3/coins/${ID_MOEDA}/market_chart?vs_currency=usd&days=365`;
+  const r = await fetch(url);
+  const d = await r.json();
+  const volPorDia = {};
+  d.total_volumes.forEach(([ts, v]) => { volPorDia[new Date(ts).toDateString()] = v; });
+  historico = d.prices.map(([ts, p]) => {
+    const dt = new Date(ts);
+    return { t: dt, preco: p, volume: volPorDia[dt.toDateString()] };
+  });
+  preencherTabela7d();
+}
+
+// ===== Tabela 7 dias (1 ponto por dia) =====
+function preencherTabela7d() {
+  // pega o último ponto de cada dia, nos últimos ~8 dias
+  const porDia = {};
+  historico.forEach(p => { porDia[p.t.toDateString()] = p; });
+  const dias = Object.values(porDia).slice(-8); // 8 para calcular variação do 1º
+  const linhas = [];
+  for (let i = dias.length - 1; i >= 1; i--) {
+    const hoje = dias[i], ontem = dias[i - 1];
+    const variacao = ((hoje.preco - ontem.preco) / ontem.preco) * 100;
+    linhas.push(`<tr>
+      <td>${hoje.t.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" })}</td>
+      <td>${fmtUSD(hoje.preco, hoje.preco < 10 ? 4 : 2)}</td>
+      <td>${setaPct(variacao)}</td>
+      <td>${fmtCompact(hoje.volume)}</td>
+    </tr>`);
+  }
+  document.getElementById("tabela-7d").innerHTML = linhas.join("");
+}
+
+// ===== 3) Status do dia (lê o último relatório diário do GitHub) =====
+async function carregarStatus() {
+  try {
+    const lista = await listarRepo();
+    const relatorios = lista
+      .filter(f => f.name.startsWith(PREFIXO_DIARIA) && f.name.endsWith(".md"))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!relatorios.length) { return; }
+    const ultimo = relatorios[relatorios.length - 1];
+    const texto = await (await fetch(ultimo.download_url)).text();
+
+    // Bandeira geral: vermelho se houver 🔴, senão amarelo se 🟡, senão verde
+    let cor = "verde", rotulo = "Tudo tranquilo";
+    if (texto.includes("🔴")) { cor = "vermelho"; rotulo = "Atenção — há alerta vermelho"; }
+    else if (texto.includes("🟡")) { cor = "amarelo"; rotulo = "Cautela — pontos a observar"; }
+
+    document.getElementById("bandeira").className = "bandeira " + cor;
+    document.getElementById("status-titulo").textContent = rotulo;
+
+    // Resumo: primeira linha de citação (começa com ">"), senão a 2ª linha do relatório
+    const linhas = texto.split("\n");
+    let resumo = linhas.find(l => l.trim().startsWith(">"));
+    resumo = resumo ? resumo.replace(/^>\s*/, "").replace(/\*\*/g, "") : (linhas[1] || "");
+    const dataArq = ultimo.name.replace(PREFIXO_DIARIA, "").replace(".md", "");
+    document.getElementById("status-resumo").innerHTML =
+      destacar(resumo) + ` <span style="opacity:.65">(relatório de ${dataArq})</span>`;
+
+    // Lista detalhada: cada seção (### N. 🟢 Tópico) + sua linha de interpretação
+    const itens = [];
+    for (let i = 0; i < linhas.length; i++) {
+      if (linhas[i].startsWith("### ")) {
+        const titulo = linhas[i].replace(/^###\s+/, "").replace(/^\d+\.\s*/, "").replace(/\*\*/g, "");
+        let detalhe = "";
+        for (let j = i + 1; j < linhas.length; j++) {
+          const t = linhas[j].trim();
+          if (!t) continue;
+          if (t.startsWith("#")) break;
+          detalhe = t.replace(/^>\s*/, "").replace(/\*\*/g, "");
+          break;
+        }
+        itens.push({ titulo, detalhe });
+      }
+    }
+    document.getElementById("status-itens").innerHTML = itens.map(it => {
+      let fcls = "";
+      if (it.titulo.includes("🔴")) fcls = "f-vermelho";
+      else if (it.titulo.includes("🟡")) fcls = "f-amarelo";
+      else if (it.titulo.includes("🟢")) fcls = "f-verde";
+      return `<div class="status-item ${fcls}"><div class="si-titulo">${it.titulo}</div>` +
+        (it.detalhe ? detalheEmTopicos(it.detalhe) : "") +
+        `</div>`;
+    }).join("");
+  } catch (e) {
+    document.getElementById("status-titulo").textContent = "Não foi possível ler o relatório";
+  }
+}
+
+// ===== 4) Relatórios semanais (renderizados como página) =====
+// Aplica os destaques (setinhas, valores, bullish/bearish) só nos textos,
+// sem quebrar tabelas ou títulos.
+function destacarDOM(raiz) {
+  const walker = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, null);
+  const alvos = [];
+  while (walker.nextNode()) {
+    if (walker.currentNode.textContent.trim()) alvos.push(walker.currentNode);
+  }
+  alvos.forEach(n => {
+    const novo = destacar(n.textContent);
+    if (novo !== n.textContent) {
+      const span = document.createElement("span");
+      span.innerHTML = novo;
+      n.parentNode.replaceChild(span, n);
+    }
+  });
+}
+
+async function carregarRelatorio(prefixo, elId) {
+  const el = document.getElementById(elId);
+  try {
+    const lista = await listarRepo();
+    const arqs = lista
+      .filter(f => f.name.startsWith(prefixo) && f.name.endsWith(".md"))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!arqs.length) {
+      el.innerHTML = '<p class="nd">Ainda não há relatório desta categoria. ' +
+        'Ele é gerado toda segunda-feira de manhã (ou rode manualmente na aba Actions do GitHub).</p>';
+      return;
+    }
+    const ultimo = arqs[arqs.length - 1];
+    const texto = await (await fetch(ultimo.download_url)).text();
+    el.innerHTML = marked.parse(texto);
+    destacarDOM(el);
+  } catch (e) {
+    el.innerHTML = '<p class="nd">Não foi possível carregar o relatório.</p>';
+  }
+}
+
+// ===== Abas =====
+document.querySelectorAll(".tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("ativo"));
+    btn.classList.add("ativo");
+    document.querySelectorAll(".tab-conteudo").forEach(s => { s.hidden = true; });
+    document.getElementById(btn.dataset.alvo).hidden = false;
+  });
+});
+
+// ===== Inicia tudo =====
+carregarMercado().catch(() => { document.getElementById("m-preco").textContent = "erro"; });
+carregarHistorico().catch(() => { document.getElementById("tabela-7d").innerHTML = "<tr><td colspan='4'>erro ao carregar</td></tr>"; });
+carregarStatus();
+carregarRelatorio(PREFIXO_ONCHAIN, "rel-onchain");
+carregarRelatorio(PREFIXO_TERCEIROS, "rel-terceiros");
+</script>
+</body>
+</html>
