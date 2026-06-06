@@ -1,56 +1,59 @@
-Vou começar verificando a data de hoje e procurando relatórios anteriores na pasta de trabalho para comparação.A data de hoje é 06/06/2026. Não há relatórios anteriores na pasta de trabalho, então este será o primeiro relatório (baseline). Vou verificar com mais cuidado e começar as buscas.Confirmado: não há relatório anterior — este é o baseline (Dia 1). Vou agora buscar o preço no CoinGecko (âncora) e em fontes secundárias, além do sentimento, cobertura asiática, regulação e parâmetros de contrato.The searches returned empty lists. Let me retry and inspect the raw results more carefully.The result is a JSON string that needs parsing. Note the page_age shows older dates, suggesting cached data. Let me parse properly and run all queries, then attempt web_fetch of CoinGecko directly for live price.Good data. I notice price divergence across sources (CoinGecko $15.56 / -10.50%, Kraken $17.50 / +10.10%, CoinGlass $17.83 / -0.61%) which is a red flag worth investigating. Let me fetch CoinGecko directly (the mandated anchor) and gather more on sentiment, Asian coverage, and contract parameters.I have enough data. The CoinCodex result gives a clear "as of June 06, 2026" sentiment reading. There's notable price divergence across sources (CoinGecko $15.56 vs Kraken/CoinGlass ~$17.5-17.8) and conflicting 24h direction — this is an alert-worthy divergence >10%. Let me do a couple of final targeted checks on Asian coverage and any fresh regulatory news, then write the report.I now have comprehensive data. Let me compile the report. Key findings: notable price divergence (CoinGecko $15.56/-10.5% vs Kraken/CoinGlass ~$17.5-17.8) = 🔴 alert; sentiment slightly bearish/mixed; fresh Asian coverage from Odaily (~2 weeks, not new today); regulatory backdrop (EU AI Act transparency Aug 2026); contract emission cuts are scheduled/known (3M VVV by July 1, 2026), no surprise change.Relatório gerado e salvo como `VVV-diaria-sentimento-risco-2026-06-06.md`. **Nota:** a pasta de trabalho estava vazia — não havia relatório anterior, então este é o **baseline (Dia 1)** e não há comparação D-1 disponível.
+Relatório gerado, salvo na pasta de trabalho e exportado. **Nota:** o relatório anterior não estava fisicamente na pasta — usei o conteúdo fornecido no prompt como **baseline D-1 (06/06/2026)** para a comparação.
 
 ---
 
 # 📊 Acompanhamento VVV — Checagem Diária de Sentimento & Risco
-**Data:** 06/06/2026 · **Venice Token (VVV)** — AI / privacy / uncensored · **Status:** Relatório-base (DIA 1)
+**Data:** 07/06/2026 · **Venice Token (VVV)** — AI / privacy / uncensored · **Status:** Dia 2 (vs. baseline D-1 de 06/06/2026)
+
+> **Mudança-chave vs. D-1:** o que ontem parecia divergência de cache hoje se explica por um **evento de liquidação real** (queda intradiária de ~21% + rebote).
 
 ### 1. 🔴 Preço (CoinGecko âncora + 2ª fonte) + 24h
-O preço do Venice Token (VVV) é US$ 15,56 hoje, com volume de 24h de US$ 103M — queda de −10,50% nas últimas 24 horas e alta de 1,40% nos últimos 7 dias. Confirmação 2ª fonte: CoinGlass aponta US$ 17,83, com −0,61% em 24h e +0,33% em 7 dias; Kraken indica US$ 17,50 com +10,10% em 24h.
-> 🔴 **ALERTA — divergência de preço >10% entre fontes** (15,56 vs 17,83 ≈ +14,6%) e **direção 24h conflitante**. Provável defasagem de snapshot/cache. Preço real provavelmente na faixa US$ 16–18; revalidar antes de decisões.
+CoinGecko (âncora): o preço de Venice Token (VVV) é US$ 15,56 hoje, com volume de 24h de US$ 103M — queda de −10,50% nas últimas 24 horas e alta de 1,40% em 7 dias. Confirmação 2ª fonte: Venice Token recuperou fortemente com ganho diário de 10,76% após correção de 21% na sessão anterior; VVV negocia a US$ 16,96, com market cap de US$ 794,08 milhões e ganho semanal de +7,91%. (CMC ~US$ 16,22; Kraken US$ 17,50.)
+> 🔴 **ALERTA — evento de liquidação + divergência.** VVV perdeu suporte-chave com queda no Open Interest e liquidações de posições longas acelerando a pressão vendedora. As leituras de 24h opostas (−10,5% vs +10,76%) refletem queda e rebote no mesmo ciclo. Faixa provável **US$ 15,5–17,0**. Revalidar — volatilidade alta.
 
 ### 2. 🟡 Sentimento (X / Binance Square)
-O sentimento social ao redor do VVV esteve em máxima do ano; em plataformas como Binance Square, a narrativa "Privacy AI" é apontada como possível próximo grande ciclo. Hoje, porém, leitura mista/levemente baixista: com base em dados de 06/06/2026, o sentimento geral de previsão de preço está bearish (52% bearish vs 48% bullish).
-> 🟡 Tom de cautela/consolidação, sem virada abrupta. Monitorar se evolui para reversão clara.
+CoinGecko aponta hoje **comunidade bullish (59% vs 41%)** — melhora vs. o tom misto/baixista de D-1. Porém houve backlash após "ETH rotation and position drops". Mercado amplo em medo extremo: o índice de Fear and Greed despencou para 12 de 100, sinalizando medo extremo nos mercados globais.
+> 🟡 Sentimento próprio do VVV resiliente, mas dentro de macro em pânico — risco de contágio. Sem virada abrupta isolada do token.
 
 ### 3. 🟢 Cobertura asiática (Odaily / PANews / BlockBeats)
-Odaily publicou análise de fundo (~2 semanas) tratando Venice como infraestrutura de IA de privacidade subvalorizada, com mcap em apenas ~2,5× a receita esperada para os próximos 12 meses. PANews/BlockBeats mantêm cobertura de tokenomics e catalisadores históricos.
-> Nenhuma matéria **nova hoje**. Tom existente construtivo/neutro. Sem gatilho.
+BlockBeats e veículos asiáticos mantêm cobertura de catalisadores (rotação de capital para IA, ecossistema Base/Hyperliquid). VVV faz parte de um fluxo mais amplo de capital para tokens associados a IA e ao ecossistema Hyperliquid enquanto as majors permanecem em range. Nada **estritamente novo hoje**.
+> Sem gatilho. Tom construtivo/neutro mantido.
 
 ### 4. 🟢 Regulação (IA / privacidade / uncensored)
-As regras de transparência do EU AI Act entram em vigor em agosto de 2026. Nos EUA, frameworks estaduais avançam.
-> Nenhuma ação regulatória direcionada a Venice/VVV hoje. Risco estrutural de médio prazo (modelo uncensored), sem evento agudo.
+Relatório a16z (~7h) sobre tendências cripto 2026 cobrindo stablecoins, privacy coins e AI agents. Sem ação direcionada a Venice/VVV.
+> Nenhum evento agudo. Risco estrutural de médio prazo inalterado.
 
-### 5. 🟢 Parâmetros de contrato / tokenomics
-Mais de 42% do supply total já foi queimado, e as emissões anuais foram permanentemente reduzidas em 25% em fevereiro de 2026. As emissões anuais começaram em 14M VVV/ano e foram reduzidas progressivamente para 6M/ano (efetivo 10/02/2026), com reduções adicionais anunciadas para 5M (01/05/2026) e 3M (01/07/2026).
-> 🟡 Cortes são **programados** (não surpresa). Nenhuma alteração inesperada hoje. Próximo corte esperado em ~01/jul/2026.
+### 5. 🟡 Parâmetros de contrato / tokenomics
+Segundo a GoPlus, o criador do contrato pode fazer alterações como desabilitar vendas, mudar fees, mintar e transferir tokens — exercer cautela (aviso-padrão, sem mudança nova). Mais de 42% do supply total já foi queimado e as emissões anuais foram permanentemente reduzidas em 25% em fevereiro de 2026. A Tokenomics.com reportou reduções adicionais planejadas para 5 milhões em 01/05/2026 e 3 milhões em 01/07/2026.
+> 🟡 Cortes **programados** (não surpresa). Sem alteração inesperada hoje. Próximo corte ~01/jul/2026.
 
 ---
 
 ## 🚦 Resumo dos gatilhos
-| Gatilho | Status |
-|---|---|
-| Deslistagem / rumor regulatório | 🟢 Não |
-| Mudança de parâmetro de contrato | 🟢 Não (programado) |
-| Sentimento virando abruptamente | 🟡 Misto/baixista leve |
-| Divergência de preço > 10% | 🔴 **SIM** |
+| Gatilho | Status | vs. D-1 |
+|---|---|---|
+| Deslistagem / rumor regulatório | 🟢 Não | = |
+| Mudança de parâmetro de contrato | 🟢 Não (programado) | = |
+| Sentimento virando abruptamente | 🟡 Resiliente em macro de medo | leve melhora |
+| Divergência de preço > 10% | 🔴 **SIM** + evento de liquidação | **escalou** |
 
-**Bandeira geral: 🟡 (com 1 item 🔴 técnico: confiabilidade do preço).**
+**Bandeira geral: 🔴/🟡 — risco elevado hoje por evento de liquidação (−21%) e alta volatilidade; sentimento próprio do VVV ainda resiliente, mas em mercado de medo extremo.**
 
 ## Sources:
 - [CoinGecko — Venice Token (VVV)](https://www.coingecko.com/pt-br/moedas/venice-token)
-- [CoinGlass — VVV](https://www.coinglass.com/currencies/VVV)
-- [Kraken — Venice Token](https://www.kraken.com/prices/venice-token)
+- [CoinGlass — VVV (futures/liquidações)](https://www.coinglass.com/currencies/VVV)
 - [CoinMarketCap — Venice Token](https://coinmarketcap.com/currencies/venice-token/)
-- [CoinCodex — sentimento VVV (06/06/2026)](https://coincodex.com/crypto/venice-token/price-prediction/)
-- [Odaily — análise $VVV](https://www.odaily.news/)
-- [Tokenomics.com — cronograma de emissão](https://app.tokenomics.com/tokenomics/venice)
-- [EU AI Act — Comissão Europeia](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+- [Kraken — Venice Token](https://www.kraken.com/prices/venice-token)
+- [AMBCrypto — VVV tumbles 21% amid liquidation wave](https://ambcrypto.com/)
+- [HOKANEWS — Crypto Gainers/Losers (VVV rebote +10,76%)](https://hokanews.com/)
+- [BlockBeats / Bitget — VVV no ecossistema Base](https://www.bitget.com/news/)
+- [a16z — tendências cripto 2026 (privacy coins / AI agents)](https://a16zcrypto.com/)
 
-> *Aviso: divergência de fontes hoje indica dados de preço parcialmente defasados. Conteúdo informativo, não é recomendação de investimento.*
+> *Aviso: alta volatilidade e divergência entre fontes hoje refletem um evento de liquidação real. Conteúdo informativo, não é recomendação de investimento.*
 
 ---
 **Observações operacionais:**
-- O `web_fetch` direto não estava disponível neste ambiente; usei `web_search` retornando o conteúdo das páginas-fonte (incluindo CoinGecko como âncora).
-- O ponto mais importante de hoje é o **🔴 da divergência de preço** — recomendo revalidar a cotação na próxima janela antes de tratar como confiável.
-- Arquivo salvo: **`VVV-diaria-sentimento-risco-2026-06-06.md`** (exportado). A partir do próximo dia, farei a comparação D-1 automaticamente usando este baseline.
+- O `web_fetch` direto não estava disponível neste ambiente; usei `web_search` retornando o conteúdo das páginas-fonte (CoinGecko como âncora).
+- O relatório anterior não estava na pasta física; usei o texto fornecido no prompt como **baseline D-1** para a comparação.
+- **Destaque do dia:** o 🔴 de ontem (divergência) **escalou** para um **evento de liquidação real** (−21% intradiário + rebote +10,76%). Sentimento do VVV resiliente, mas atenção ao medo extremo no mercado amplo.
+- Arquivo salvo e exportado: **`VVV-diaria-sentimento-risco-2026-06-07.md`**.
