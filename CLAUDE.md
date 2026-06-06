@@ -45,12 +45,23 @@ Dois objetivos, nesta ordem:
 - **Dados on-chain (rede Base, chain id 8453)**: holders, supply, staking. Contrato de staking sVVV: `0x321b7ff7...116f340ff` (confirmar endereço completo antes de usar).
 - **Status + resumo**: extrair do relatório diário mais recente nesta pasta.
 
-## Plano de migração para a nuvem (fase 2)
+## Automação na nuvem (IMPLEMENTADO)
 
-- **GitHub**: repositório que guarda o projeto e hospeda o dashboard (GitHub Pages).
-- **GitHub Actions (cron)**: "despertador" que roda os scripts todo dia sem o PC ligado.
-- **Análise de IA na nuvem**: usará uma **chave da API Anthropic** (a configurar como segredo no GitHub) — só nesta fase.
-- Felipe criará a conta do GitHub e a chave quando chegarmos aqui; guie clique a clique.
+As três tarefas agora rodam **sozinhas na nuvem**, via GitHub Actions — não precisam do computador ligado. Como funciona:
+
+- **Repositório**: `gpfelipe/vvv-acompanhamento` (privado).
+- **Chave da API**: guardada como segredo do GitHub chamado `ANTHROPIC_API_KEY`.
+- **Modelo de IA**: `claude-opus-4-8` (definido na linha `MODELO` em `scripts/rodar_tarefa.py` — trocar lá se quiser mudar).
+- **Script**: `scripts/rodar_tarefa.py` lê o prompt da tarefa, lê o relatório anterior para comparar, chama o Claude com busca na web, e salva o relatório `.md`.
+- **Agendamentos** (pasta `.github/workflows/`, horários em UTC = Brasília + 3h):
+  - `diaria.yml` — `vvv-diaria-sentimento-risco`, todo dia 06:07 BRT (`7 9 * * *`).
+  - `semanal-onchain.yml` — `on-chain-produto-e-dev`, segundas 06:00 BRT (`0 9 * * 1`).
+  - `semanal-terceiros.yml` — `terceiros-upstream`, segundas 06:06 BRT (`6 9 * * 1`).
+- Cada workflow também tem `workflow_dispatch`, então dá para rodar manualmente pelo botão "Run workflow" na aba **Actions** do GitHub.
+- Os relatórios são salvos no próprio repositório (commit automático feito pelo GitHub Actions).
+
+### Próxima fase
+- **Dashboard** `index.html` lendo os relatórios + dados ao vivo da CoinGecko, publicado via **GitHub Pages**.
 
 ## Roteiro (faça em ordem, confirmando cada passo)
 

@@ -1,0 +1,30 @@
+name: VVV diária - sentimento e risco
+
+on:
+  schedule:
+    # 06:07 de Brasília = 09:07 UTC, todos os dias
+    - cron: "7 9 * * *"
+  workflow_dispatch: {}   # permite rodar manualmente pelo botão "Run workflow"
+
+jobs:
+  rodar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Rodar a tarefa diária
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/rodar_tarefa.py vvv-diaria-sentimento-risco
+      - name: Salvar o relatório no repositório
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Relatório diário automático (sentimento e risco)"
+          git push
